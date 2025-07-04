@@ -28,23 +28,13 @@ jobs:
         id: vars
         run: echo "SHORT_SHA=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
 
-      - name: Create GitHub Release
-        uses: softprops/action-gh-release@v2
+      - name: Create or Update GitHub Release and Upload Asset
+        uses: ncipollo/release-action@v1
         with:
-          tag_name: ${{ steps.vars.outputs.SHORT_SHA }}
+          tag: ${{ steps.vars.outputs.SHORT_SHA }}
           name: Release ${{ steps.vars.outputs.SHORT_SHA }}
-          body: |
-            Automaticky vygenerovaný release pro commit ${{ steps.vars.outputs.SHORT_SHA }}.
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        continue-on-error: true
-
-      - name: Upload release asset
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: ${{ steps.vars.outputs.SHORT_SHA }}
-          name: docker-starter-linux-amd64
-          files: docker-starter
-          fail_on_unmatched_files: false
+          body: Automaticky vygenerovaný release pro commit ${{ steps.vars.outputs.SHORT_SHA }}.
+          artifacts: docker-starter
+          allowUpdates: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
