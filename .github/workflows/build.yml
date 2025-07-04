@@ -3,8 +3,6 @@ name: Build Go Binary
 on:
   push:
     branches: [ main ]
-  pull_request:
-    branches: [ main ]
   workflow_dispatch:
 
 jobs:
@@ -23,8 +21,25 @@ jobs:
         run: |
           GOOS=linux GOARCH=amd64 go build -o docker-starter main.go
 
-      - name: Upload artifact
-        uses: actions/upload-artifact@v4
+      - name: Get short commit hash
+        id: vars
+        run: echo "SHORT_SHA=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
         with:
+          tag_name: ${{ steps.vars.outputs.SHORT_SHA }}
+          name: Release ${{ steps.vars.outputs.SHORT_SHA }}
+          body: |
+            Automaticky vygenerovaný release pro commit ${{ steps.vars.outputs.SHORT_SHA }}.
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload release asset
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.vars.outputs.SHORT_SHA }}
           name: docker-starter-linux-amd64
-          path: docker-starter
+          files: docker-starter
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
