@@ -37,6 +37,7 @@ jobs:
             Automaticky vygenerovaný release pro commit ${{ steps.vars.outputs.SHORT_SHA }}.
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        continue-on-error: true
 
       - name: Upload release asset
         uses: softprops/action-gh-release@v2
@@ -44,5 +45,6 @@ jobs:
           tag_name: ${{ steps.vars.outputs.SHORT_SHA }}
           name: docker-starter-linux-amd64
           files: docker-starter
+          fail_on_unmatched_files: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
